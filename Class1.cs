@@ -44,7 +44,7 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
 
             var entity = context.InputParameters["Target"] as Entity;
 
-            goon_ecgmultiline = entity.GetAttributeValue<string>("goon_ecg");
+            goon_ecgmultiline = entity.GetAttributeValue<string>("goon_ecgmultiline");
             IOrganizationService service =
                    ((IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory))).CreateOrganizationService(null);
 
@@ -81,11 +81,10 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
         {
             var newConta = new Entity("goon_logErros");
             //criar campos na entidade ECG
-            newConta["message"] = goon_messageerror;
-
-            newConta["body"] = goon_ecgbody;
-            newConta["robo"] = goon_ecgroboname;       // nome da entidade  
-            newConta["status"] = goon_ecgstatus;      //true false
+            //newConta["message"] = goon_messageerror;
+            //newConta["body"] = goon_ecgbody;
+            //newConta["robo"] = goon_ecgroboname;       // nome da entidade  
+            //newConta["status"] = goon_ecgstatus;      //true false
             service.Create(newConta);
         }
     }
