@@ -2,6 +2,7 @@
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -55,7 +56,7 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
                 if (entity.Contains("goon_ecgmultiline"))
                 {
 
-                    this.PersistenciaRobo(service, context,("goon_ecgmultiline"));
+                    this.PersistenciaRobo(service, context, goon_ecgmultiline);
                 }
             }
             catch (InvalidPluginExecutionException ex)
@@ -68,13 +69,47 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
             }
         }
 
-        private void PersistenciaRobo(IOrganizationService service, IPluginExecutionContext context, string tipoContrato)
+        private void PersistenciaRobo(IOrganizationService service, IPluginExecutionContext context, string content)
         {
-            var newConta = new Entity("account");
-            newConta["cnpj"] = "99999999999999";
-            newConta["picklistqq"] = new OptionSetValue(32322121);
-            newConta["picklistqq"] = new EntityReference("contact", new Guid(""));
-            service.Create(newConta);
+            var retContentFormatado = this.ParseContentDw(content);
+
+            foreach (var item in retContentFormatado)
+            {
+                var newGrupoEconomico = new Entity("goon_grupoeconomico"); // revisar nome da entidade
+                newGrupoEconomico["goon_code"] = item.Value; // suposicao, efetuar verificacao de nome de campos
+                newGrupoEconomico["goon_description"] = item.Value; //...........
+                newGrupoEconomico["picklistqq"] = item.Value; //.............
+                service.Create(newGrupoEconomico);
+            }
+
+            
+        }
+
+        //REVISAR SE O FORMATO SGTRING AO INVES DO LOCAL DE ARQUIVO FUNCIONOU
+        private IDictionary<string, string> ParseContentDw (string content)
+        {
+            var content_ = content.Replace("\"", "").Replace("\n", "*");
+
+        IDictionary<string, string> dicContent = new Dictionary<string, string>();
+
+            var linhas = content.Split('*') ;
+            int cont = 0;
+
+                foreach (var linha in linhas)
+                {
+                    var colunas = linha.Split(';');
+
+                    if (cont != 0) {
+                    dicContent.Add("CODE", colunas[0]);
+                    dicContent.Add("DESCRIPTION01", colunas[1]);
+                    dicContent.Add("TERCEIRO", colunas[2]);
+                    }
+
+                    cont++;
+                }
+
+            return dicContent;
+
         }
 
         private void RegistraLogErro(Exception ex, string goon_ecgmultiline, IOrganizationService service)
