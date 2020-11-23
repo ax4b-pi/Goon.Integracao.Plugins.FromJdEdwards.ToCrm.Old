@@ -8,7 +8,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
+namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm.goon_gra
 {
 	public class PreCreate : IPlugin
 	{
@@ -32,7 +32,7 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
             if (!context.MessageName.Equals("create", StringComparison.InvariantCultureIgnoreCase))
                 return;
 
-            if (!context.PrimaryEntityName.Equals("goon_ecg", StringComparison.InvariantCultureIgnoreCase))
+            if (!context.PrimaryEntityName.Equals("goon_crmgra", StringComparison.InvariantCultureIgnoreCase))
                 return;
 
             if (!context.InputParameters.Contains("Target"))
@@ -41,11 +41,11 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
             if (!(context.InputParameters["Target"] is Entity))
                 return;
 
-            var goon_ecgmultiline = "";
+            var goon_gramultiline = "";
 
             var entity = context.InputParameters["Target"] as Entity;
 
-            goon_ecgmultiline = entity.GetAttributeValue<string>("goon_ecgmultiline");
+            goon_gramultiline = entity.GetAttributeValue<string>("goon_gramultiline");
             IOrganizationService service =
                    ((IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory))).CreateOrganizationService(null);
 
@@ -53,19 +53,20 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
             {
 
            
-                if (entity.Contains("goon_ecgmultiline"))
+                if (entity.Contains("goon_gramultiline"))
                 {
-
-                    this.PersistenciaRobo(service, context, goon_ecgmultiline);
+                    // RODO Leandro: REPARTIR EM ARQUIVOS A CADA MILHAO DE CARACTERES (TRANSFORMAR EM PRE CREATE)
+                    
+                    this.PersistenciaRobo(service, context, goon_gramultiline);
                 }
             }
             catch (InvalidPluginExecutionException ex)
             {
-                this.RegistraLogErro( ex, goon_ecgmultiline, service);
+                this.RegistraLogErro( ex, goon_gramultiline, service);
             }
             catch (Exception ex)
             {
-                this.RegistraLogErro(ex, goon_ecgmultiline, service);
+                this.RegistraLogErro(ex, goon_gramultiline, service);
             }
         }
 
@@ -75,11 +76,11 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
 
             foreach (var item in retContentFormatado)
             {
-                var newGrupoEconomico = new Entity("goon_grupoeconomico"); // revisar nome da entidade
-                newGrupoEconomico["goon_code"] = item.Value; // suposicao, efetuar verificacao de nome de campos
-                newGrupoEconomico["goon_description"] = item.Value; //...........
-                newGrupoEconomico["picklistqq"] = item.Value; //.............
-                service.Create(newGrupoEconomico);
+                var newAccount = new Entity("goon_crmgra"); // revisar nome da entidade
+                newAccount["goon_code"] = item.Value; // suposicao, efetuar verificacao de nome de campos
+                newAccount["goon_description"] = item.Value; //...........
+                newAccount["picklistqq"] = item.Value; //.............
+                service.Create(newAccount);
             }
 
             
@@ -100,10 +101,28 @@ namespace Goon.Integracao.Plugins.FromJdEdwards.ToCrm
                     var colunas = linha.Split(';');
 
                     if (cont != 0) {
-                    dicContent.Add("CODE", colunas[0]);
-                    dicContent.Add("DESCRIPTION01", colunas[1]);
-                    dicContent.Add("TERCEIRO", colunas[2]);
-                    }
+                    dicContent.Add("FISCALYEAR", colunas[0]);
+                    dicContent.Add("CUSTOMER", colunas[1]);
+                    dicContent.Add("SHIPTONAME", colunas[2]);
+                    dicContent.Add("SALESPERSON", colunas[3]);
+                    dicContent.Add("SALES_REP_NAME", colunas[4]);
+                    dicContent.Add("SCENARIO", colunas[5]);
+                    dicContent.Add("ITEMNUMBER02", colunas[6]);
+                    dicContent.Add("DESCRIPTION01", colunas[7]);
+                    dicContent.Add("MEASURENAME", colunas[8]);
+                    dicContent.Add("JUL", colunas[9]);
+                    dicContent.Add("AUG", colunas[10]);
+                    dicContent.Add("SEP", colunas[11]);
+                    dicContent.Add("OCT", colunas[12]);
+                    dicContent.Add("NOV", colunas[13]);
+                    dicContent.Add("DEC", colunas[14]);
+                    dicContent.Add("JAN", colunas[15]);
+                    dicContent.Add("FEB", colunas[16]);
+                    dicContent.Add("MAR", colunas[17]);
+                    dicContent.Add("APR", colunas[18]);
+                    dicContent.Add("MAY", colunas[19]);
+                    dicContent.Add("JUN", colunas[20]);
+                }
 
                     cont++;
                 }
